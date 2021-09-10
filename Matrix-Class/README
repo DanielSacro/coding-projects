@@ -1,0 +1,62 @@
+// ---------------------------------------------------
+// Name: Daniel Sacro
+// CMPUT 275, Winter 2021
+//
+// Assignment 4: Matrix Class
+// ---------------------------------------------------
+
+The matrix.cpp program and matrix.h header allow the
+user to fully implement matrices into their own programs
+as classes, complete with following matrix operations:
+-Matrix Creation
+-Matrix Addition, Subtraction, and Multiplication
+-Unary Negation (Switching of entries' integer signs)
+-Matrix Transposition
+-Submatrix Creation (From existing matrices)
+-Matrix indexing
+-Insertion and Extraction (Inputting values into the
+matrix via extraction ">>" or printing them out through
+insertion "<<")
+
+Additional Notes:
+
+In order to create a matrix, the user must use either syntax: 1) Matrix(total_rows, total_columns, initial_value)
+-> Syntax 1 creates a total_rows x total_columns matrix where each
+entry is equal to initial_value (a float) 2) Matrix(total_rows, total_columns, array)
+-> Syntax 2 creates a total_rows x total_columns matrix where each
+entry is filled by the elements in array individual. Rows are
+filled out one by one completely from left to right.
+-> Array must contain only floats.
+
+Matrix Addition, Subtraction, Multiplication, and Unary
+Negation follow regular syntax rules:
+-> MtrxC = MtrxA + MtrxB
+-> MtrxC = MtrxA - MtrxB
+-> MtrxC = MtrxA \* MtrxB
+-> MtrxC = -MtrxA
+
+Matrix Transposition is performed by using the following syntax:
+-> mtrx.transpose()
+
+In order to create a submatrix from an already existing matrix,
+the user must use the following syntax:
+-> mtrx.submatrix(row_start, row_end, column_start, column_end)
+-> Submatrix includes rows row_start to row_end - 1 and
+columns column_start to column_end - 1
+
+Matrix Indexing is performed by using the following syntax:
+-> mtrx[r][c]
+-> r is the row index and c is the column index
+
+Insertion and Extraction can be done using regular syntax:
+-> cin >> mtrx;
+-> Takes in n space separated floats where n is the total amount
+of entries in the matrix
+-> cout << mtrx;
+-> Prints out the matrix into the terminal exactly how it would
+be visualized physically (i.e a rectangular array of numbers)
+
+For matrix.cpp to be fully functional upon compilation, you must have
+the following files within the same folder:
+-> matrix.cpp
+-> matrix.h

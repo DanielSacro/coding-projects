@@ -1,0 +1,200 @@
+// ---------------------------------------------------
+// Name: Daniel Sacro
+// CMPUT 275, Winter 2021
+//
+// Major Assignment 1: Navigation System (Individual)
+// ---------------------------------------------------
+
+------------------- Project Summary -------------------
+
+The Navigation System finds the shortest route between
+any two points on the map of Edmonton. It does this via
+a server-client process where the client sends any two
+chosen points on the map to the server and requests it
+to find the shortest path between them. When the server
+receives the two points and the client's request, it
+computes the path using an undirected weighted graph and
+Dijkstra's algorithm. Afterwards, the server relays the
+route to the client via a series of waypoints and
+coordinates. The client then uses these waypoints to
+construct a highlighted path between the two points
+on the map.
+
+-------------------- Credits Section --------------------
+
+The majority of the code written for this Navigation
+System project was created by the professors, Dr. Omid
+Ardakanian and Dr. Zachary Friggstad, and their TAs for
+the course CMPUT 275 at the University of Alberta. Their
+personal contributions served as the starter code for
+this major assignment.
+
+Only the following files have been modified or written in
+by the student (Daniel Sacro):
+-> client.cpp (main() implementation)
+-> dijkstra.cpp (Function and class implementation)
+-> server.cpp (Entire implementation)
+
+------------------ Running Instructions -----------------
+
+Before proceeding, it is important to note that the
+Navigation System was written on the Ubuntu OS using
+a virtual machine (VMware Workstation) and is intended
+to run on that specific OS. The following running
+instructions assume that you are using the Ubuntu OS
+(or a similar Unix OS) to run the program.
+
+IMPORTANT NOTE: Please use the "make" command in the
+terminal to compile each required .cpp file prior to
+running the program. Also ensure that your terminal
+is in the correct directory/folder titled
+"Navigation-System" when executing this command. If you
+wish to delete all executable files from this program
+after running it, please use the "make clean" command.
+
+In order to properly set up the Navigation System, the
+following programs must be executed in the exact order
+that they are listed:
+-> server
+-> client
+-> plotter
+
+To run each program in order, the following commands
+must be executed in their own SEPARATE terminals from
+the folder/directory called "Navigation-System":
+-> ./server/server [PORT]
+-> ./client/client [PORT] [SERVER IP]
+-> ./plotter
+
+Here, [PORT] is the desired port for the server to listen to
+(safe range is 5000-64000), and [SERVER IP] is the server IP
+address that the client should be connected to. For
+this program set-up, a local server on a virtual machine
+is used. It's IP address is "127.0.0.1".
+
+-------------------- Client Section --------------------
+
+The client.cpp program allows the user to create a
+"client" program capable of relaying information
+between the plotter and the server. It communicates
+map coordinates with the plotter via a pipe, and
+sends various requests to the server through a socket.
+These requests are sent in the following forms:
+
+    -> R <sLat> <sLon> <eLat> <eLon>
+    	-This request asks the server to find the
+    	 path of shortest distance between two points
+    	 on the map of Edmonton.
+    	-Here, <sLat> and <sLon> are the latitude and
+    	 longitude coordinates of the starting point
+    	 respectively. Similarly, <eLat> and <eLon>
+    	 are the latitude and longitude coordinates of
+    	 the ending point respectively.
+    -> Q
+    	-This request tells the server to quit and
+    	 terminate its program
+    	-It is only sent whenever the client itself
+    	 closes (i.e. the plotter tells the client to
+    	 quit and terminate too).
+
+Additionally, once the requests are processed by the
+server, the server sends information to the client
+which gets sent further to the plotter in either of
+the two forms:
+
+    -> <lat> <lon>
+    	-The latitude and longitude coordinates of a
+    	 specific waypoint.
+    -> E
+    	-The signal that tells the plotter that there
+    	 are no more waypoints to process. The plotter
+    	 will begin drawing the paths between each
+    	 waypoint afterwards.
+    	-If no waypoints were given, no path will be
+    	 drawn. This case will only occur when there
+    	 is no path between the starting and ending
+    	 points (i.e. the server sends "N 0" or "N 1"
+    	 to the client, where the number after "N"
+    	 indicates the total number of waypoints on
+    	 the shortest path).
+
+Additional Notes:
+
+The coordinates in the client's request to the server
+are provided by the plotter program. They are initially
+received from the plotter as a decimal of data type
+"double", but are sent to the server as the data type
+"long long integer". The coordinates received from the
+server are also received as the data type "long long
+integer". The conversions between these data types
+are made strictly within the client.
+
+If "N 0" is received from the server, no waypoints
+are sent to the plotter. Only "E" is sent.
+
+If "N 1" is received from the server, a single
+waypoint is sent to the plotter, followed by "E".
+The plotter will attempt to draw a path between
+the waypoints, but no path will appear.
+
+The total number of waypoints received from the
+server is never communicated to the plotter via the
+client.
+
+If the plotter is ever closed, it sends "Q\n" to the
+client. This tells the client to quit and terminate.
+It also causes "Q\n" to be sent to the server, which
+closes it.
+
+-------------------- Server Section --------------------
+
+The server.cpp program allows the user to create a
+server that communicates information to the client via
+a socket. The information that gets communicated to the
+client is based on the client's specific requests
+(mentioned in the above section), and is sent in the
+following order:
+
+    -> N <Number of Waypoints>
+    	-The first bit of information that gets sent
+    	 tells the client the total number of waypoints
+    	 on the path.
+    	-If the number displayed next to N is 0, then
+    	 it indicates that there are no paths to the
+    	 given end point from the starting point. No
+    	 waypoints are sent after this, only "E".
+    -> <lat> <lon>
+    	-The next bit of information that gets sent
+    	 tells the client exactly where a particular
+    	 waypoint is located.
+    	-Here, <lat> and <lon> are the waypoint's
+    	 latitude and longitude coordinates respectively.
+    	-Before each waypoint is sent, the server awaits
+    	 acknowledgement from the client. Acknowledgement
+    	 is confirmed when the letter "A" is received
+    	 from the client. This is checked for to
+    	 confirm that the previous set of data sent
+    	 was received by the client.
+    -> E
+    	-The last bit of information that gets sent
+    	 tells the client that there are no more
+    	 waypoints to be sent to it.
+
+Additional Notes:
+
+For this program to run properly, the
+edmonton-roads-2.0.1.txt file must be in the exact same
+folder as the server directory. Otherwise, the program
+will crash due to a segmentation fault.
+
+If "Q\n" is ever received from the client, the server
+will close.
+
+For the server.cpp program to be compiled correctly,
+the following files must be in the same folder:
+-> digraph.cpp
+-> digraph.h
+-> wdigraph.h
+-> dijkstra.cpp
+-> dijkstra.h
+-> edmonton-roads-2.0.1.txt

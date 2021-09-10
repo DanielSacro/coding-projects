@@ -1,0 +1,89 @@
+// ----------------------------------------------------
+// Name: Daniel Sacro
+// CMPUT 274, Fall 2020
+//
+// Major Assignment #2: Huffman Coding (File Compression)
+// ----------------------------------------------------
+
+------------------- Project Summary -------------------
+
+The purpose of this major assignment is to utilize the
+Huffman compression algorithm to compress various files
+(into a .huf file) and later decompress them when they
+are to be displayed in a web browser via a local server.
+
+------------------- Credits Section -------------------
+
+The majority of the code written for this File Compression
+project was created by the professor, Dr. Paul Lu, and
+his TAs for the course CMPUT 274 at the University of
+Alberta. Their personal contributions served as the starter
+code for this major assignment.
+
+Only the following files have been modified or written in
+by the student (Daniel Sacro):
+-> util.py (Function implementation)
+
+------------------ util.py Information -----------------
+
+The util.py program supports the following functionalities:
+-> The ability to read Huffman trees via read_tree()
+-> The ability to create Huffman trees via write_tree()
+-> The ability to decode encrypted bytes via decode_byte()
+-> The ability to decompress a .huf file via decompress()
+-> The ability to compress a file into a .huf file via compress()
+
+It is important to have the following files in the same
+directory as util.py since it relies on them to function
+properly:
+-> bitio.py
+-> huffman.py
+-> compress.py
+-> decompress.py
+
+------------------ Running Instructions -----------------
+
+To run the compressor on a file, first make sure that the
+desired file is in the wwwroot directory. After ensuring
+that, run the following command in the terminal while in
+the wwwroot directory:
+
+python3 ../compress.py <yourFileName>
+
+This will generate the compressed version of your file
+titled "<yourFileName>.huf".
+
+Afterwards, you can view your compressed file on a web
+browser via a local server by using the following command
+in the terminal:
+
+python3 ../webserver.py
+
+This will create the web server and allow you to view your
+compressed file via the url: http://localhost:8000/yourFileName
+By default, going to http://localhost:8000 instead will show you
+the already compressed test files within the wwwroot directory
+and not your desired compressed file. Therefore, it is important
+to add your file's name onto the end of the url where
+"yourFileName" is located.
+
+Example:
+Let's that we have an image we want to compress titled
+"Python-Emblem.jpg". In order to compress it, we must
+save it into the wwwroot directory, and then navigate
+to that directory via a terminal. Once we're at that
+directory, we run the command:
+
+python3 ../compress.py Python-Emblem.jpg
+
+This will compress our file into "Python-Emblem.jpg.huf".
+To view this file in a web browser afterwards, we run:
+
+python3 ../webserver.py
+
+This creates the web server for our browser. All that's
+left to do after these steps is to open the specific
+URL: http://localhost:8000/Python-Emblem.jpg
+
+Web browser screenshots of the default URL and custom
+URL can be found in the folder titled "Huffman-Coding-Showcase"
