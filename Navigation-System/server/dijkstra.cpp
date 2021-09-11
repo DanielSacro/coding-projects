@@ -24,8 +24,7 @@ typedef pair<int, long long> PIL;
 	element is PIL */
 typedef pair<int, PIL> PIPIL;
 
-class CompGreater
-{
+class CompGreater {
 	/* 	Description: Comparison class for the priority queue template.
 					 Effectively makes the priority queue a min heap.
 
@@ -34,15 +33,13 @@ class CompGreater
 		Returns: Nothing.
 	*/
 public:
-	bool operator()(const PIPIL &lhs, const PIPIL &rhs) const
-	{
+	bool operator()(const PIPIL &lhs, const PIPIL &rhs) const {
 		// min heap using distance/weight values in PIPIL
 		return (lhs.second.second > rhs.second.second);
 	}
 };
 
-void dijkstra(const WDigraph &graph, int startVertex, unordered_map<int, PIL> &tree)
-{
+void dijkstra(const WDigraph &graph, int startVertex, unordered_map<int, PIL> &tree) {
 	/*	Description: Uses dijkstra's algorithm to compute least cost paths starting 
 					 from a given vertex (startVertex). Uses priority_queue to act
 					 as a min heap.
@@ -66,8 +63,7 @@ void dijkstra(const WDigraph &graph, int startVertex, unordered_map<int, PIL> &t
 	fires.push(PIPIL(startVertex, PIL(-1, 0)));
 
 	// While there is an active fire
-	while (!fires.empty())
-	{
+	while (!fires.empty()) {
 		// Find the fire that reaches endpoint v the earliest
 		auto earliestFire = fires.top();
 
@@ -79,8 +75,7 @@ void dijkstra(const WDigraph &graph, int startVertex, unordered_map<int, PIL> &t
 		fires.pop();
 
 		// If v is already burned/reached, don't do anything
-		if (tree.find(v) != tree.end())
-		{
+		if (tree.find(v) != tree.end()) {
 			continue;
 		}
 
@@ -88,8 +83,7 @@ void dijkstra(const WDigraph &graph, int startVertex, unordered_map<int, PIL> &t
 		tree[v] = PIL(u, d);
 
 		// Fire spreads across all edges exiting vertex v
-		for (auto it = graph.neighbours(v); it != graph.endIterator(v); it++)
-		{
+		for (auto it = graph.neighbours(v); it != graph.endIterator(v); it++) {
 			int nbr = *it;
 
 			// Fire starts at v at time d and reaches

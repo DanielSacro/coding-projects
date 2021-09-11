@@ -36,8 +36,7 @@
 
 using namespace std;
 
-struct Point
-{
+struct Point {
   /*  Description: A structure that holds the latitude and longitude
          coordinates of a given vertex point.
 
@@ -50,8 +49,7 @@ struct Point
   long long lon;
 };
 
-long long mathattan(const Point &pt1, const Point &pt2)
-{
+long long mathattan(const Point &pt1, const Point &pt2) {
   /*  Description: Calculates the mathattan distance between 2
            given points.
 
@@ -68,8 +66,7 @@ long long mathattan(const Point &pt1, const Point &pt2)
   return totDist;
 }
 
-int findClosest(const Point &pt, const unordered_map<int, Point> &points)
-{
+int findClosest(const Point &pt, const unordered_map<int, Point> &points) {
   /*  Description: Finds the vertex closest to any given reference point
 
       Arguments:
@@ -85,8 +82,7 @@ int findClosest(const Point &pt, const unordered_map<int, Point> &points)
   map<long long, int> pointsDist;
 
   // Compute the distance between pt and all vertices on the map
-  for (auto it = points.begin(); it != points.end(); it++)
-  {
+  for (auto it = points.begin(); it != points.end(); it++) {
     long long dist = mathattan(pt, it->second);
     pointsDist[dist] = it->first;
   }
@@ -96,8 +92,7 @@ int findClosest(const Point &pt, const unordered_map<int, Point> &points)
   return closestV;
 }
 
-void readGraph(string filename, WDigraph &graph, unordered_map<int, Point> &points)
-{
+void readGraph(string filename, WDigraph &graph, unordered_map<int, Point> &points) {
   /*  Description: Reads inputs from a text file and constructs a
         directed graph using these inputs and an empty graph
 
@@ -113,14 +108,12 @@ void readGraph(string filename, WDigraph &graph, unordered_map<int, Point> &poin
   string inputLine;
 
   // read the text file line by line
-  while (getline(file, inputLine))
-  {
+  while (getline(file, inputLine)) {
     string mode = inputLine.substr(0, 1);
     // str1 is inputLine with the mode removed
     string str1 = inputLine.substr(2, inputLine.length() - 2);
 
-    if (mode == "V")
-    {
+    if (mode == "V") {
       // read and separate inputs
       int com1 = str1.find(",");
       // vStr is the vertex v
@@ -150,8 +143,7 @@ void readGraph(string filename, WDigraph &graph, unordered_map<int, Point> &poin
       coords.lon = lon;
       points[v] = coords;
     }
-    else if (mode == "E")
-    {
+    else if (mode == "E") {
       int com1 = str1.find(",");
       // vStr is the first vertex v
       string vStr = str1.substr(0, com1);
@@ -176,8 +168,7 @@ void readGraph(string filename, WDigraph &graph, unordered_map<int, Point> &poin
   }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   WDigraph graph;
   unordered_map<int, Point> points;
 
@@ -195,8 +186,7 @@ int main(int argc, char *argv[])
 
   // Listening socket creation
   lstn_socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-  if (lstn_socket_desc == -1)
-  {
+  if (lstn_socket_desc == -1) {
     cerr << "Listening socket creation failed!\n";
     return 1;
   }
@@ -206,15 +196,13 @@ int main(int argc, char *argv[])
   my_addr.sin_port = htons(PORT);
   my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(lstn_socket_desc, (struct sockaddr *)&my_addr, sizeof my_addr) == -1)
-  {
+  if (bind(lstn_socket_desc, (struct sockaddr *)&my_addr, sizeof my_addr) == -1) {
     cerr << "Binding failed!\n";
     close(lstn_socket_desc);
     return 1;
   }
 
-  if (listen(lstn_socket_desc, LISTEN_BACKLOG) == -1)
-  {
+  if (listen(lstn_socket_desc, LISTEN_BACKLOG) == -1) {
     cerr << "Cannot listen to the specified socket!\n";
     close(lstn_socket_desc);
     return 1;
@@ -223,12 +211,10 @@ int main(int argc, char *argv[])
   socklen_t peer_addr_size = sizeof my_addr;
 
   // Allow multiple connections
-  while (true)
-  {
+  while (true) {
     // Connect
     conn_socket_desc = accept(lstn_socket_desc, (struct sockaddr *)&peer_addr, &peer_addr_size);
-    if (conn_socket_desc == -1)
-    {
+    if (conn_socket_desc == -1) {
       cerr << "Connection socket creation failed!\n";
       return 1;
     }
@@ -236,19 +222,16 @@ int main(int argc, char *argv[])
 
     // Mode implemented to check for the input "Q"
     string mode = "";
-    while (true)
-    {
+    while (true) {
       // When a request is given, read it
       int rec_size = recv(conn_socket_desc, buffer, BUFFER_SIZE, 0);
-      if (rec_size == -1)
-      {
+      if (rec_size == -1) {
         cout << "Timeout occurred... still waiting!\n";
         continue;
       }
 
       // If "Q\n" was received, close the server
-      if (strcmp("Q\n", buffer) == 0)
-      {
+      if (strcmp("Q\n", buffer) == 0) {
         mode = "Quit";
         cout << "Connection closing...\n";
         break;
@@ -257,20 +240,16 @@ int main(int argc, char *argv[])
       // Split input by space and assume "\n" is the end
       string tempStr;
       vector<string> clientRequest;
-      for (int i = 0; i < BUFFER_SIZE; i++)
-      {
-        if (buffer[i] == ' ')
-        {
+      for (int i = 0; i < BUFFER_SIZE; i++) {
+        if (buffer[i] == ' ') {
           clientRequest.push_back(tempStr);
           tempStr.erase();
         }
-        else if (buffer[i] == '\n')
-        {
+        else if (buffer[i] == '\n') {
           clientRequest.push_back(tempStr);
           break;
         }
-        else
-        {
+        else {
           tempStr += buffer[i];
         }
       }
@@ -293,16 +272,13 @@ int main(int argc, char *argv[])
       dijkstra(graph, start, tree);
 
       // no path
-      if (tree.find(end) == tree.end())
-      {
+      if (tree.find(end) == tree.end()) {
         string noPathMsg = "N 0";
         send(conn_socket_desc, noPathMsg.c_str(), noPathMsg.length() + 1, 0);
       }
-      else
-      {
+      else {
         list<int> path;
-        while (end != start)
-        {
+        while (end != start) {
           path.push_front(end);
           end = tree[end].first;
         }
@@ -312,19 +288,16 @@ int main(int argc, char *argv[])
         string pathMsg = "N " + to_string(path.size());
         send(conn_socket_desc, pathMsg.c_str(), pathMsg.length() + 1, 0);
 
-        for (int v : path)
-        {
+        for (int v : path) {
           // Wait for acknowledgement before sending each waypoint
           int rec_size = recv(conn_socket_desc, buffer, BUFFER_SIZE, 0);
-          if (rec_size == -1)
-          {
+          if (rec_size == -1) {
             cout << "Timeout occurred... still waiting!\n";
             continue;
           }
 
           // Make sure an acknowledgement was received
-          if (strcmp("A", buffer) != 0)
-          {
+          if (strcmp("A", buffer) != 0) {
             cerr << "Acknowledgement failed... \n";
             return 1;
           }
@@ -340,15 +313,13 @@ int main(int argc, char *argv[])
 
         // Await acknowledgement before telling client there are no more waypoints
         int rec_size = recv(conn_socket_desc, buffer, BUFFER_SIZE, 0);
-        if (rec_size == -1)
-        {
+        if (rec_size == -1) {
           cout << "Timeout occurred... still waiting!\n";
           continue;
         }
 
         // Make sure an acknowledgement was received
-        if (strcmp("A", buffer) != 0)
-        {
+        if (strcmp("A", buffer) != 0) {
           cerr << "Acknowledgement failed... \n";
           return 1;
         }

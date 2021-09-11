@@ -15,21 +15,18 @@
 #include <cstring>
 #include <vector>
 #include <string>
-// Add more libraries, macros, functions, and global variables if needed
 
 #define BUFFER_SIZE 1024
 #define MSG_SIZE 1024
 
 using namespace std;
 
-int create_and_open_fifo(const char *pname, int mode)
-{
+int create_and_open_fifo(const char *pname, int mode) {
     // creating a fifo special file in the current working directory
     // with read-write permissions for communication with the plotter
     // both processes must open the fifo before they can perform
     // read and write operations on it
-    if (mkfifo(pname, 0666) == -1)
-    {
+    if (mkfifo(pname, 0666) == -1) {
         cout << "Unable to make a fifo. Ensure that this pipe does not exist already!" << endl;
         exit(-1);
     }
@@ -39,8 +36,7 @@ int create_and_open_fifo(const char *pname, int mode)
     // returned
     int fd = open(pname, mode);
 
-    if (fd == -1)
-    {
+    if (fd == -1) {
         cout << "Error: failed on opening named pipe." << endl;
         exit(-1);
     }
@@ -48,8 +44,7 @@ int create_and_open_fifo(const char *pname, int mode)
     return fd;
 }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
     const char *inpipe = "inpipe";
     const char *outpipe = "outpipe";
 
@@ -69,8 +64,7 @@ int main(int argc, char const *argv[])
 
     // Build socket
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_desc == -1)
-    {
+    if (socket_desc == -1) {
         cerr << "Listening socket creation failed!\n";
         return 1;
     }
@@ -83,8 +77,7 @@ int main(int argc, char const *argv[])
     peer_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     // Connect to server
-    if (connect(socket_desc, (struct sockaddr *)&peer_addr, sizeof peer_addr) == -1)
-    {
+    if (connect(socket_desc, (struct sockaddr *)&peer_addr, sizeof peer_addr) == -1) {
         cerr << "Cannot connect to the host!\n";
         close(socket_desc);
         return 1;
@@ -92,8 +85,7 @@ int main(int argc, char const *argv[])
 
     char line1[MSG_SIZE];
     char line2[MSG_SIZE];
-    while (true)
-    {
+    while (true) {
         // Make sure buffer/line is empty first.
         memset(line1, 0, MSG_SIZE);
         memset(line2, 0, MSG_SIZE);
@@ -101,16 +93,14 @@ int main(int argc, char const *argv[])
         // Read start point from inpipe
 
         int bytesread1 = read(in, line1, MSG_SIZE);
-        if (strcmp("Q\n", line1) == 0)
-        {
+        if (strcmp("Q\n", line1) == 0) {
             send(socket_desc, line1, MSG_SIZE, 0);
             break;
         }
 
         // Read end point from inpipe
         int bytesread2 = read(in, line2, MSG_SIZE);
-        if (strcmp("Q\n", line2) == 0)
-        {
+        if (strcmp("Q\n", line2) == 0) {
             send(socket_desc, line2, MSG_SIZE, 0);
             break;
         }
@@ -121,41 +111,33 @@ int main(int argc, char const *argv[])
         // Prepare to send start and end points to server as a request
         vector<string> lVec1, lVec2;
         string tempStr;
-        for (int i = 0; i < MSG_SIZE; i++)
-        {
-            if (line1[i] == ' ')
-            {
+        for (int i = 0; i < MSG_SIZE; i++) {
+            if (line1[i] == ' ') {
                 lVec1.push_back(tempStr);
                 tempStr.erase();
             }
-            else if (line1[i] == '\n')
-            {
+            else if (line1[i] == '\n') {
                 // Assume newline is the end of the string
                 lVec1.push_back(tempStr);
                 break;
             }
-            else
-            {
+            else {
                 tempStr += line1[i];
             }
         }
 
         tempStr = "";
-        for (int j = 0; j < MSG_SIZE; j++)
-        {
-            if (line2[j] == ' ')
-            {
+        for (int j = 0; j < MSG_SIZE; j++) {
+            if (line2[j] == ' ') {
                 lVec2.push_back(tempStr);
                 tempStr.erase();
             }
-            else if (line2[j] == '\n')
-            {
+            else if (line2[j] == '\n') {
                 // Assume newline is the end of the string
                 lVec2.push_back(tempStr);
                 break;
             }
-            else
-            {
+            else {
                 tempStr += line2[j];
             }
         }
@@ -183,11 +165,9 @@ int main(int argc, char const *argv[])
         // Error if exitStr is sent as a string. Needs to be a char. array
         char endStr[exitStr.length()];
         strcpy(endStr, exitStr.c_str());
-        while (true)
-        {
+        while (true) {
             // If server finds no waypoints, wait for new points from plotter
-            if (strcmp("N 0", inbound) == 0)
-            {
+            if (strcmp("N 0", inbound) == 0) {
                 // write E\n to the plotter
                 write(out, endStr, sizeof endStr);
                 break;
@@ -201,28 +181,23 @@ int main(int argc, char const *argv[])
             // Has little to no effect if "E\n" is received
             tempStr = "";
             vector<string> WPvec;
-            for (int l = 0; l < BUFFER_SIZE; l++)
-            {
-                if (inbound[l] == ' ')
-                {
+            for (int l = 0; l < BUFFER_SIZE; l++) {
+                if (inbound[l] == ' ') {
                     WPvec.push_back(tempStr);
                     tempStr.erase();
                 }
-                else if (inbound[l] == '\n')
-                {
+                else if (inbound[l] == '\n') {
                     // Assume newline is the end of the string
                     WPvec.push_back(tempStr);
                     break;
                 }
-                else
-                {
+                else {
                     tempStr += inbound[l];
                 }
             }
 
             // No waypoints to relay if "E\n" was received
-            if (WPvec[0] == "E")
-            {
+            if (WPvec[0] == "E") {
                 write(out, endStr, sizeof endStr);
                 break;
             }
